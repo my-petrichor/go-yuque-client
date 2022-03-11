@@ -12,7 +12,7 @@ type deleteOptions struct {
 	namespace string
 }
 
-func newDeleteCommand(yuqueCli command.Cli) *cobra.Command {
+func newDeleteCommand() *cobra.Command {
 	var opts deleteOptions
 
 	cmd := &cobra.Command{
@@ -20,7 +20,7 @@ func newDeleteCommand(yuqueCli command.Cli) *cobra.Command {
 		Short: "Delete a repo (must set namespace flag)",
 		Args:  command.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runDelete(yuqueCli, &opts)
+			return runDelete(&opts)
 		},
 	}
 
@@ -30,7 +30,7 @@ func newDeleteCommand(yuqueCli command.Cli) *cobra.Command {
 	return cmd
 }
 
-func runDelete(yuqueCli command.Cli, opts *deleteOptions) error {
+func runDelete(opts *deleteOptions) error {
 	// if !command.Login() {
 	// 	return internal.ErrNoLogin
 	// }

@@ -13,7 +13,7 @@ type searcherOptions struct {
 	kind string
 }
 
-func NewSearcherCommand(yuqueCli command.Cli) *cobra.Command {
+func NewSearcherCommand() *cobra.Command {
 	var opts searcherOptions
 
 	cmd := &cobra.Command{
@@ -21,7 +21,7 @@ func NewSearcherCommand(yuqueCli command.Cli) *cobra.Command {
 		Short: "Search by keyword",
 		Args:  command.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runSearcher(yuqueCli, args[0], &opts)
+			return runSearcher(args[0], &opts)
 		},
 	}
 
@@ -31,7 +31,7 @@ func NewSearcherCommand(yuqueCli command.Cli) *cobra.Command {
 	return cmd
 }
 
-func runSearcher(yuqueCli command.Cli, keyWord string, opts *searcherOptions) error {
+func runSearcher(keyWord string, opts *searcherOptions) error {
 	// if !command.Login() {
 	// 	return internal.ErrNoLogin
 	// }

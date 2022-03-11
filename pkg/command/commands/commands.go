@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"github.com/my-Sakura/go-yuque-client/pkg/command"
 	"github.com/my-Sakura/go-yuque-client/pkg/command/document"
 	"github.com/my-Sakura/go-yuque-client/pkg/command/group"
 	"github.com/my-Sakura/go-yuque-client/pkg/command/registry"
@@ -11,19 +10,19 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func AddCommands(cmd *cobra.Command, yuqueCli command.Cli) {
+func AddCommands(cmd *cobra.Command) {
 	cmd.AddCommand(
-		user.NewUserCommand(yuqueCli),
+		user.NewUserCommand(),
 
-		document.NewDocumentCommand(yuqueCli),
+		document.NewDocumentCommand(),
 
-		group.NewGroupCommand(yuqueCli),
+		group.NewGroupCommand(),
 
-		repo.NewRepoCommand(yuqueCli),
+		repo.NewRepoCommand(),
 
-		searcher.NewSearcherCommand(yuqueCli),
+		searcher.NewSearcherCommand(),
 
-		registry.NewLoginCommand(yuqueCli),
-		registry.NewLogoutCommand(yuqueCli),
+		registry.NewLoginCommand(),
+		registry.NewLogoutCommand(),
 	)
 }

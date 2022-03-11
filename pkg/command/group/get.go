@@ -9,20 +9,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newGetCommand(yuqueCli command.Cli) *cobra.Command {
+func newGetCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get [OPTIONS] GROUPLOGIN",
 		Short: "Get a group info",
 		Args:  command.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runGetMember(yuqueCli, args[0])
+			return runGetMember(args[0])
 		},
 	}
 
 	return cmd
 }
 
-func runGet(yuqueCli command.Cli, groupLogin string) error {
+func runGet(groupLogin string) error {
 	// if !command.Login() {
 	// 	return internal.ErrNoLogin
 	// }

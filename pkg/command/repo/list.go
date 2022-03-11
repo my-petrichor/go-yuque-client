@@ -14,7 +14,7 @@ type listOptions struct {
 	userOrGroup int
 }
 
-func newListCommand(yuqueCli command.Cli) *cobra.Command {
+func newListCommand() *cobra.Command {
 	var opts listOptions
 
 	cmd := &cobra.Command{
@@ -22,7 +22,7 @@ func newListCommand(yuqueCli command.Cli) *cobra.Command {
 		Short: "List all repo under user or group (must set login flag)",
 		Args:  command.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runList(yuqueCli, &opts)
+			return runList(&opts)
 		},
 	}
 
@@ -33,7 +33,7 @@ func newListCommand(yuqueCli command.Cli) *cobra.Command {
 	return cmd
 }
 
-func runList(yuqueCli command.Cli, opts *listOptions) error {
+func runList(opts *listOptions) error {
 	// if !command.Login() {
 	// 	return internal.ErrNoLogin
 	// }

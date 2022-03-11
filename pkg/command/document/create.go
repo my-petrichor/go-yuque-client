@@ -16,7 +16,7 @@ type createOptions struct {
 	public int
 }
 
-func newCreateCommand(yuqueCli command.Cli) *cobra.Command {
+func newCreateCommand() *cobra.Command {
 	var opts createOptions
 
 	cmd := &cobra.Command{
@@ -24,7 +24,7 @@ func newCreateCommand(yuqueCli command.Cli) *cobra.Command {
 		Short: "Create a document",
 		Args:  command.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runCreate(yuqueCli, args[0], &opts)
+			return runCreate(args[0], &opts)
 		},
 	}
 
@@ -38,7 +38,7 @@ func newCreateCommand(yuqueCli command.Cli) *cobra.Command {
 	return cmd
 }
 
-func runCreate(yuqueCli command.Cli, namespace string, opts *createOptions) error {
+func runCreate(namespace string, opts *createOptions) error {
 	// if !command.Login() {
 	// 	return internal.ErrNoLogin
 	// }

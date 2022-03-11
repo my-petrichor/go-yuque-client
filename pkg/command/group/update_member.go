@@ -15,7 +15,7 @@ type UpdateMemberOptions struct {
 	groupLogin string
 }
 
-func newUpdateMemberCommand(yuqueCli command.Cli) *cobra.Command {
+func newUpdateMemberCommand() *cobra.Command {
 	var opts UpdateMemberOptions
 
 	cmd := &cobra.Command{
@@ -27,7 +27,7 @@ func newUpdateMemberCommand(yuqueCli command.Cli) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return runUpdateMember(yuqueCli, role, &opts)
+			return runUpdateMember(role, &opts)
 		},
 	}
 
@@ -38,7 +38,7 @@ func newUpdateMemberCommand(yuqueCli command.Cli) *cobra.Command {
 	return cmd
 }
 
-func runUpdateMember(yuqueCli command.Cli, role int, opts *UpdateMemberOptions) error {
+func runUpdateMember(role int, opts *UpdateMemberOptions) error {
 	// if !command.Login() {
 	// 	return internal.ErrNoLogin
 	// }

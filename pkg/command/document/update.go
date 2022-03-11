@@ -17,7 +17,7 @@ type updateOptions struct {
 	forceASL int
 }
 
-func newUpdateCommand(yuqueCli command.Cli) *cobra.Command {
+func newUpdateCommand() *cobra.Command {
 	var opts updateOptions
 
 	cmd := &cobra.Command{
@@ -25,7 +25,7 @@ func newUpdateCommand(yuqueCli command.Cli) *cobra.Command {
 		Short: "Update a document",
 		Args:  command.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runUpdate(yuqueCli, args[0], &opts)
+			return runUpdate(args[0], &opts)
 		},
 	}
 
@@ -40,7 +40,7 @@ func newUpdateCommand(yuqueCli command.Cli) *cobra.Command {
 	return cmd
 }
 
-func runUpdate(yuqueCli command.Cli, path string, opts *updateOptions) error {
+func runUpdate(path string, opts *updateOptions) error {
 	// if !command.Login() {
 	// 	return internal.ErrNoLogin
 	// }

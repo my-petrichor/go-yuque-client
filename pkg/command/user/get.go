@@ -5,6 +5,7 @@ import (
 	"os"
 
 	yuque "github.com/my-Sakura/go-yuque-api"
+	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
 	"github.com/spf13/cobra"
 )
@@ -13,7 +14,7 @@ type getOptions struct {
 	name bool
 }
 
-func newGetCommand(yuqueCli command.Cli) *cobra.Command {
+func newGetCommand() *cobra.Command {
 	var opts getOptions
 
 	cmd := &cobra.Command{
@@ -21,7 +22,7 @@ func newGetCommand(yuqueCli command.Cli) *cobra.Command {
 		Short: "Get user info",
 		Args:  command.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runGet(yuqueCli, &opts)
+			return runGet(&opts)
 		},
 	}
 
@@ -31,10 +32,10 @@ func newGetCommand(yuqueCli command.Cli) *cobra.Command {
 	return cmd
 }
 
-func runGet(yuqueCli command.Cli, opts *getOptions) error {
-	// if !command.Login() {
-	// 	return internal.ErrNoLogin
-	// }
+func runGet(opts *getOptions) error {
+	if !command.Login() {
+		return internal.ErrNoLogin
+	}
 	token := os.Getenv("token")
 	c := yuque.NewClient(token)
 	u, err := c.User.GetInfo()

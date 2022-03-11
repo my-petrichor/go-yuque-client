@@ -13,7 +13,7 @@ type getOptions struct {
 	name bool
 }
 
-func newGetCommand(yuqueCli command.Cli) *cobra.Command {
+func newGetCommand() *cobra.Command {
 	var opts getOptions
 
 	cmd := &cobra.Command{
@@ -21,7 +21,7 @@ func newGetCommand(yuqueCli command.Cli) *cobra.Command {
 		Short: "Get user info",
 		Args:  command.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runGet(yuqueCli, &opts)
+			return runGet(&opts)
 		},
 	}
 
@@ -31,7 +31,7 @@ func newGetCommand(yuqueCli command.Cli) *cobra.Command {
 	return cmd
 }
 
-func runGet(yuqueCli command.Cli, opts *getOptions) error {
+func runGet(opts *getOptions) error {
 	// if !command.Login() {
 	// 	return internal.ErrNoLogin
 	// }

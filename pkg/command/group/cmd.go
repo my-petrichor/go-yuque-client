@@ -5,23 +5,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewGroupCommand(yuqueCli command.Cli) *cobra.Command {
+func NewGroupCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "group",
 		Short: "Manage group",
 		Args:  command.NoArgs,
-		RunE:  command.ShowHelp(yuqueCli.Err()),
+		RunE:  command.ShowHelp(),
 	}
 	cmd.AddCommand(
-		newListCommand(yuqueCli),
-		newListPublicCommand(yuqueCli),
-		newGetCommand(yuqueCli),
-		newGetMemberCommand(yuqueCli),
-		newCreateCommand(yuqueCli),
-		newUpdateCommand(yuqueCli),
-		newUpdateMemberCommand(yuqueCli),
-		newDeleteCommand(yuqueCli),
-		newDeleteMemberCommand(yuqueCli),
+		newListCommand(),
+		newListPublicCommand(),
+		newGetCommand(),
+		newGetMemberCommand(),
+		newCreateCommand(),
+		newUpdateCommand(),
+		newUpdateMemberCommand(),
+		newDeleteCommand(),
+		newDeleteMemberCommand(),
 	)
 
 	return cmd

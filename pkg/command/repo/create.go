@@ -20,7 +20,7 @@ type createOptions struct {
 	userOrGroup int
 }
 
-func newCreateCommand(yuqueCli command.Cli) *cobra.Command {
+func newCreateCommand() *cobra.Command {
 	var opts createOptions
 
 	cmd := &cobra.Command{
@@ -28,7 +28,7 @@ func newCreateCommand(yuqueCli command.Cli) *cobra.Command {
 		Short: "Create a repo (must set login, slug, name, type and user_or_group flag)",
 		Args:  command.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runCreate(yuqueCli, &opts)
+			return runCreate(&opts)
 		},
 	}
 
@@ -45,7 +45,7 @@ func newCreateCommand(yuqueCli command.Cli) *cobra.Command {
 	return cmd
 }
 
-func runCreate(yuqueCli command.Cli, opts *createOptions) error {
+func runCreate(opts *createOptions) error {
 	// if !command.Login() {
 	// 	return internal.ErrNoLogin
 	// }

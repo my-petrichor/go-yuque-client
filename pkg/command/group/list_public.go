@@ -9,20 +9,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newListPublicCommand(yuqueCli command.Cli) *cobra.Command {
+func newListPublicCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list_public [OPTIONS]",
 		Short: "List all public group",
 		Args:  command.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runListPublic(yuqueCli)
+			return runListPublic()
 		},
 	}
 
 	return cmd
 }
 
-func runListPublic(yuqueCli command.Cli) error {
+func runListPublic() error {
 	// if !command.Login() {
 	// 	return internal.ErrNoLogin
 	// }

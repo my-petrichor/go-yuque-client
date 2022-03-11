@@ -5,19 +5,19 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewDocumentCommand(yuqueCli command.Cli) *cobra.Command {
+func NewDocumentCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "document",
 		Short: "Manage document",
 		Args:  command.NoArgs,
-		RunE:  command.ShowHelp(yuqueCli.Err()),
+		RunE:  command.ShowHelp(),
 	}
 	cmd.AddCommand(
-		newListCommand(yuqueCli),
-		newGetCommand(yuqueCli),
-		newCreateCommand(yuqueCli),
-		newUpdateCommand(yuqueCli),
-		newDeleteCommand(yuqueCli),
+		newListCommand(),
+		newGetCommand(),
+		newCreateCommand(),
+		newUpdateCommand(),
+		newDeleteCommand(),
 	)
 
 	return cmd

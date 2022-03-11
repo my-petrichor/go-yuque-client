@@ -5,20 +5,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewRepoCommand(yuqueCli command.Cli) *cobra.Command {
+func NewRepoCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "repo",
 		Short: "Manage repo",
 		Args:  command.NoArgs,
-		RunE:  command.ShowHelp(yuqueCli.Err()),
+		RunE:  command.ShowHelp(),
 	}
 	cmd.AddCommand(
-		newListCommand(yuqueCli),
-		newGetCommand(yuqueCli),
-		newGetDirCommand(yuqueCli),
-		newCreateCommand(yuqueCli),
-		newUpdateCommand(yuqueCli),
-		newDeleteCommand(yuqueCli),
+		newListCommand(),
+		newGetCommand(),
+		newGetDirCommand(),
+		newCreateCommand(),
+		newUpdateCommand(),
+		newDeleteCommand(),
 	)
 
 	return cmd

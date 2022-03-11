@@ -9,20 +9,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newListCommand(yuqueCli command.Cli) *cobra.Command {
+func newListCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list [OPTIONS] LOGIN",
 		Short: "List all group that user join in",
 		Args:  command.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runList(yuqueCli, args[0])
+			return runList(args[0])
 		},
 	}
 
 	return cmd
 }
 
-func runList(yuqueCli command.Cli, login string) error {
+func runList(login string) error {
 	// if !command.Login() {
 	// 	return internal.ErrNoLogin
 	// }

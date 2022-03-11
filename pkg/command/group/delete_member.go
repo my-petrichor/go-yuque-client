@@ -13,7 +13,7 @@ type deleteMemberOptions struct {
 	groupLogin string
 }
 
-func newDeleteMemberCommand(yuqueCli command.Cli) *cobra.Command {
+func newDeleteMemberCommand() *cobra.Command {
 	var opts createOptions
 
 	cmd := &cobra.Command{
@@ -21,7 +21,7 @@ func newDeleteMemberCommand(yuqueCli command.Cli) *cobra.Command {
 		Short: "Delete a group member",
 		Args:  command.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runCreate(yuqueCli, args[0], &opts)
+			return runCreate(args[0], &opts)
 		},
 	}
 
@@ -31,7 +31,7 @@ func newDeleteMemberCommand(yuqueCli command.Cli) *cobra.Command {
 	return cmd
 }
 
-func runDeleteMember(yuqueCli command.Cli, login string, opts *createOptions) error {
+func runDeleteMember(login string, opts *createOptions) error {
 	// if !command.Login() {
 	// 	return internal.ErrNoLogin
 	// }

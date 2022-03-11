@@ -12,7 +12,7 @@ type getDirOptions struct {
 	namespace string
 }
 
-func newGetDirCommand(yuqueCli command.Cli) *cobra.Command {
+func newGetDirCommand() *cobra.Command {
 	var opts getDirOptions
 
 	cmd := &cobra.Command{
@@ -20,7 +20,7 @@ func newGetDirCommand(yuqueCli command.Cli) *cobra.Command {
 		Short: "Get repo dir (must set namespace flag)",
 		Args:  command.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runGetDir(yuqueCli, &opts)
+			return runGetDir(&opts)
 		},
 	}
 
@@ -30,7 +30,7 @@ func newGetDirCommand(yuqueCli command.Cli) *cobra.Command {
 	return cmd
 }
 
-func runGetDir(yuqueCli command.Cli, opts *getDirOptions) error {
+func runGetDir(opts *getDirOptions) error {
 	// if !command.Login() {
 	// 	return internal.ErrNoLogin
 	// }

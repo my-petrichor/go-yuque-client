@@ -5,15 +5,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewUserCommand(yuqueCli command.Cli) *cobra.Command {
+func NewUserCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "user",
 		Short: "Manage user",
 		Args:  command.NoArgs,
-		RunE:  command.ShowHelp(yuqueCli.Err()),
+		RunE:  command.ShowHelp(),
 	}
 	cmd.AddCommand(
-		newGetCommand(yuqueCli),
+		newGetCommand(),
 	)
 
 	return cmd

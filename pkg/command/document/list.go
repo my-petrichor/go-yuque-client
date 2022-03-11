@@ -17,7 +17,7 @@ type listOptions struct {
 	public int
 }
 
-func newListCommand(yuqueCli command.Cli) *cobra.Command {
+func newListCommand() *cobra.Command {
 	var opts createOptions
 
 	cmd := &cobra.Command{
@@ -25,7 +25,7 @@ func newListCommand(yuqueCli command.Cli) *cobra.Command {
 		Short: "List all document under a repo",
 		Args:  command.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runList(yuqueCli, args[0], &opts)
+			return runList(args[0], &opts)
 		},
 	}
 
@@ -39,7 +39,7 @@ func newListCommand(yuqueCli command.Cli) *cobra.Command {
 	return cmd
 }
 
-func runList(yuqueCli command.Cli, namespace string, opts *createOptions) error {
+func runList(namespace string, opts *createOptions) error {
 	// if !command.Login() {
 	// 	return internal.ErrNoLogin
 	// }

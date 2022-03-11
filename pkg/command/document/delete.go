@@ -8,20 +8,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newDeleteCommand(yuqueCli command.Cli) *cobra.Command {
+func newDeleteCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete [OPTIONS] PATH",
 		Short: "Delete a document",
 		Args:  command.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runDelete(yuqueCli, args[0])
+			return runDelete(args[0])
 		},
 	}
 
 	return cmd
 }
 
-func runDelete(yuqueCli command.Cli, path string) error {
+func runDelete(path string) error {
 	// if !command.Login() {
 	// 	return internal.ErrNoLogin
 	// }

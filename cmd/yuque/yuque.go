@@ -60,7 +60,7 @@ func DisableFlagsInUseLine(cmd *cobra.Command) {
 	})
 }
 
-func setupHelpCommand(yuqueCli command.Cli, rootCmd, helpCmd *cobra.Command) {
+func setupHelpCommand(rootCmd, helpCmd *cobra.Command) {
 	origRun := helpCmd.Run
 	origRunE := helpCmd.RunE
 
@@ -74,7 +74,7 @@ func setupHelpCommand(yuqueCli command.Cli, rootCmd, helpCmd *cobra.Command) {
 	}
 }
 
-func runYuque(yuqueCli *command.Client) error {
+func runYuque() error {
 	cmd := &cobra.Command{
 		Use:                   "yuque [OPTIONS] COMMAND [ARG...]",
 		Short:                 "A simple yuque application manage tool",
@@ -84,7 +84,7 @@ func runYuque(yuqueCli *command.Client) error {
 		DisableFlagsInUseLine: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) == 0 {
-				return command.ShowHelp(yuqueCli.Err())(cmd, args)
+				return command.ShowHelp()(cmd, args)
 			}
 			return fmt.Errorf("yuque: '%s' is not a yuque command.\nSee 'yuque --help'", args[0])
 		},
@@ -104,7 +104,7 @@ func runYuque(yuqueCli *command.Client) error {
 	cmd.SetHelpTemplate(helpTemplate)
 
 	DisableFlagsInUseLine(cmd)
-	commands.AddCommands(cmd, yuqueCli)
+	commands.AddCommands(cmd)
 
 	return cmd.Execute()
 }
@@ -138,9 +138,7 @@ func managementSubCommands(cmd *cobra.Command) []*cobra.Command {
 }
 
 func main() {
-	yuqueCli := command.NewClient()
-
-	if err := runYuque(yuqueCli); err != nil {
+	if err := runYuque(); err != nil {
 		log.Fatalln(err)
 	}
 }

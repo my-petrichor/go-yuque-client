@@ -20,9 +20,10 @@ func newUpdateCommand(client *internal.Client) *cobra.Command {
 	var opts updateOptions
 
 	cmd := &cobra.Command{
-		Use:   "update [OPTIONS] PATH",
-		Short: "Update a document",
-		Args:  command.ExactArgs(1),
+		Use:              "update [OPTIONS] PATH",
+		Short:            "Update a document",
+		Args:             command.ExactArgs(1),
+		PersistentPreRun: client.CheckLogin(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runUpdate(client, args[0], &opts)
 		},
@@ -40,10 +41,6 @@ func newUpdateCommand(client *internal.Client) *cobra.Command {
 }
 
 func runUpdate(client *internal.Client, path string, opts *updateOptions) error {
-	if !client.IsLogin() {
-		return internal.ErrNoLogin
-	}
-
 	namespace, slug, err := splitPath(path)
 	if err != nil {
 		return err

@@ -3,6 +3,7 @@ package searcher
 import (
 	"fmt"
 
+	huge "github.com/dablelv/go-huge-util"
 	"github.com/my-Sakura/go-yuque-api"
 	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
@@ -18,9 +19,10 @@ func NewSearcherCommand(client *internal.Client) *cobra.Command {
 	var opts searcherOptions
 
 	cmd := &cobra.Command{
-		Use:   "searcher [OPTIONS] KEYWORD",
-		Short: "Search by keyword",
-		Args:  command.ExactArgs(1),
+		Use:              "searcher [OPTIONS] KEYWORD",
+		Short:            "Search by keyword",
+		Args:             command.ExactArgs(1),
+		PersistentPreRun: client.CheckLogin(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runSearcher(client, args[0], &opts)
 		},
@@ -34,10 +36,6 @@ func NewSearcherCommand(client *internal.Client) *cobra.Command {
 }
 
 func runSearcher(client *internal.Client, keyWord string, opts *searcherOptions) error {
-	if !client.IsLogin() {
-		return internal.ErrNoLogin
-	}
-
 	c, err := yuque.NewClient(client.Token)
 	if err != nil {
 		return err
@@ -49,9 +47,12 @@ func runSearcher(client *internal.Client, keyWord string, opts *searcherOptions)
 	if err != nil {
 		return err
 	}
-	for _, v := range s.Data {
-		fmt.Println(v.Title, v.Summary)
+
+	data, err := huge.ToIndentJSON(&s.Data)
+	if err != nil {
+		return err
 	}
+	fmt.Println(data)
 
 	return nil
 }

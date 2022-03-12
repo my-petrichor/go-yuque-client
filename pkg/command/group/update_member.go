@@ -18,9 +18,10 @@ func newUpdateMemberCommand(client *internal.Client) *cobra.Command {
 	var opts UpdateMemberOptions
 
 	cmd := &cobra.Command{
-		Use:   "update_member [OPTIONS] ROLE",
-		Short: "Update group member authority (0 - manager, 1 - ordinary), (must set group_login and login flag)",
-		Args:  command.ExactArgs(1),
+		Use:              "update_member [OPTIONS] ROLE",
+		Short:            "Update group member authority (0 - manager, 1 - ordinary)",
+		Args:             command.ExactArgs(1),
+		PersistentPreRun: client.CheckLogin(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			role, err := strconv.Atoi(args[0])
 			if err != nil {
@@ -34,14 +35,13 @@ func newUpdateMemberCommand(client *internal.Client) *cobra.Command {
 	flags.StringVarP(&opts.groupLogin, "group_login", "g", "", "Login of group")
 	flags.StringVarP(&opts.login, "login", "l", "", "Login of user who need to update")
 
+	cmd.MarkFlagRequired("group_login")
+	cmd.MarkFlagRequired("login")
+
 	return cmd
 }
 
 func runUpdateMember(client *internal.Client, role int, opts *UpdateMemberOptions) error {
-	if !client.IsLogin() {
-		return internal.ErrNoLogin
-	}
-
 	c, err := yuque.NewClient(client.Token)
 	if err != nil {
 		return err

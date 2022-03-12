@@ -9,9 +9,10 @@ import (
 
 func newDeleteCommand(client *internal.Client) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "delete [OPTIONS] GROUPLOGIN",
-		Short: "Delete a group",
-		Args:  command.ExactArgs(1),
+		Use:              "delete [OPTIONS] GROUPLOGIN",
+		Short:            "Delete a group",
+		Args:             command.ExactArgs(1),
+		PersistentPreRun: client.CheckLogin(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runDelete(client, args[0])
 		},
@@ -21,10 +22,6 @@ func newDeleteCommand(client *internal.Client) *cobra.Command {
 }
 
 func runDelete(client *internal.Client, groupLogin string) error {
-	if !client.IsLogin() {
-		return internal.ErrNoLogin
-	}
-
 	c, err := yuque.NewClient(client.Token)
 	if err != nil {
 		return err

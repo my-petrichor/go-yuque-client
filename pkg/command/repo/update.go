@@ -19,9 +19,10 @@ func newUpdateCommand(client *internal.Client) *cobra.Command {
 	var opts updateOptions
 
 	cmd := &cobra.Command{
-		Use:   "update [OPTIONS] NAMESPACE",
-		Short: "Update a repo",
-		Args:  command.ExactArgs(1),
+		Use:              "update [OPTIONS] NAMESPACE",
+		Short:            "Update a repo",
+		Args:             command.ExactArgs(1),
+		PersistentPreRun: client.CheckLogin(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runUpdate(client, args[0], &opts)
 		},
@@ -39,10 +40,6 @@ func newUpdateCommand(client *internal.Client) *cobra.Command {
 }
 
 func runUpdate(client *internal.Client, namespace string, opts *updateOptions) error {
-	if !client.IsLogin() {
-		return internal.ErrNoLogin
-	}
-
 	c, err := yuque.NewClient(client.Token)
 	if err != nil {
 		return err

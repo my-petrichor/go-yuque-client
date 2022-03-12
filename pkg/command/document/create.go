@@ -19,9 +19,10 @@ func newCreateCommand(client *internal.Client) *cobra.Command {
 	var opts createOptions
 
 	cmd := &cobra.Command{
-		Use:   "create [OPTIONS] NAMESPACE",
-		Short: "Create a document",
-		Args:  command.ExactArgs(1),
+		Use:              "create [OPTIONS] NAMESPACE",
+		Short:            "Create a document",
+		Args:             command.ExactArgs(1),
+		PersistentPreRun: client.CheckLogin(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runCreate(client, args[0], &opts)
 		},
@@ -38,10 +39,6 @@ func newCreateCommand(client *internal.Client) *cobra.Command {
 }
 
 func runCreate(client *internal.Client, namespace string, opts *createOptions) error {
-	if !client.IsLogin() {
-		return internal.ErrNoLogin
-	}
-
 	c, err := yuque.NewClient(client.Token)
 	if err != nil {
 		return err

@@ -3,6 +3,7 @@ package group
 import (
 	"fmt"
 
+	huge "github.com/dablelv/go-huge-util"
 	yuque "github.com/my-Sakura/go-yuque-api"
 	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
@@ -11,9 +12,10 @@ import (
 
 func newListPublicCommand(client *internal.Client) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list_public [OPTIONS]",
-		Short: "List all public group",
-		Args:  command.NoArgs,
+		Use:              "list_public [OPTIONS]",
+		Short:            "List all public group",
+		Args:             command.NoArgs,
+		PersistentPreRun: client.CheckLogin(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runListPublic(client)
 		},
@@ -23,10 +25,6 @@ func newListPublicCommand(client *internal.Client) *cobra.Command {
 }
 
 func runListPublic(client *internal.Client) error {
-	if !client.IsLogin() {
-		return internal.ErrNoLogin
-	}
-
 	c, err := yuque.NewClient(client.Token)
 	if err != nil {
 		return err
@@ -36,9 +34,11 @@ func runListPublic(client *internal.Client) error {
 		return err
 	}
 
-	for _, g := range groups.Data {
-		fmt.Printf("group name: %s\ngroup login: %s\n", g.Name, g.Login)
+	data, err := huge.ToIndentJSON(&groups.Data)
+	if err != nil {
+		return err
 	}
+	fmt.Println(data)
 
 	return nil
 }

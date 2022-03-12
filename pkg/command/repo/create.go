@@ -23,9 +23,10 @@ func newCreateCommand(client *internal.Client) *cobra.Command {
 	var opts createOptions
 
 	cmd := &cobra.Command{
-		Use:   "create [OPTIONS]",
-		Short: "Create a repo (must set slug, name, type and user_or_group flag)",
-		Args:  command.NoArgs,
+		Use:              "create [OPTIONS]",
+		Short:            "Create a repo",
+		Args:             command.NoArgs,
+		PersistentPreRun: client.CheckLogin(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runCreate(client, &opts)
 		},
@@ -40,14 +41,15 @@ func newCreateCommand(client *internal.Client) *cobra.Command {
 	flags.IntVarP(&opts.public, "public", "p", 0,
 		"Public of repo (0 - private, 1 - all user, 2 - space member, 3 - all user under space (include external contact), 4 - only repo) default 0")
 
+	cmd.MarkFlagRequired("user_or_group")
+	cmd.MarkFlagRequired("type")
+	cmd.MarkFlagRequired("name")
+	cmd.MarkFlagRequired("slug")
+
 	return cmd
 }
 
 func runCreate(client *internal.Client, opts *createOptions) error {
-	if !client.IsLogin() {
-		return internal.ErrNoLogin
-	}
-
 	c, err := yuque.NewClient(client.Token)
 	if err != nil {
 		return err

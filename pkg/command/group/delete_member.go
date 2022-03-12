@@ -15,9 +15,10 @@ func newDeleteMemberCommand(client *internal.Client) *cobra.Command {
 	var opts deleteMemberOptions
 
 	cmd := &cobra.Command{
-		Use:   "delete_member LOGIN",
-		Short: "Delete a group member",
-		Args:  command.ExactArgs(1),
+		Use:              "delete_member LOGIN",
+		Short:            "Delete a group member",
+		Args:             command.ExactArgs(1),
+		PersistentPreRun: client.CheckLogin(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runDeleteMember(client, args[0], &opts)
 		},
@@ -30,10 +31,6 @@ func newDeleteMemberCommand(client *internal.Client) *cobra.Command {
 }
 
 func runDeleteMember(client *internal.Client, login string, opts *deleteMemberOptions) error {
-	if !client.IsLogin() {
-		return internal.ErrNoLogin
-	}
-
 	c, err := yuque.NewClient(client.Token)
 	if err != nil {
 		return err

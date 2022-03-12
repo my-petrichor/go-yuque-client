@@ -3,6 +3,7 @@ package document
 import (
 	"fmt"
 
+	huge "github.com/dablelv/go-huge-util"
 	yuque "github.com/my-Sakura/go-yuque-api"
 	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
@@ -18,12 +19,13 @@ type listOptions struct {
 }
 
 func newListCommand(client *internal.Client) *cobra.Command {
-	var opts createOptions
+	var opts listOptions
 
 	cmd := &cobra.Command{
-		Use:   "list [OPTIONS] NAMESPACE",
-		Short: "List all document under a repo",
-		Args:  command.ExactArgs(1),
+		Use:              "list [OPTIONS] NAMESPACE",
+		Short:            "List all document under a repo",
+		Args:             command.ExactArgs(1),
+		PersistentPreRun: client.CheckLogin(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runList(client, args[0], &opts)
 		},
@@ -39,11 +41,7 @@ func newListCommand(client *internal.Client) *cobra.Command {
 	return cmd
 }
 
-func runList(client *internal.Client, namespace string, opts *createOptions) error {
-	if !client.IsLogin() {
-		return internal.ErrNoLogin
-	}
-
+func runList(client *internal.Client, namespace string, opts *listOptions) error {
 	c, err := yuque.NewClient(client.Token)
 	if err != nil {
 		return err
@@ -53,9 +51,11 @@ func runList(client *internal.Client, namespace string, opts *createOptions) err
 		return err
 	}
 
-	for _, d := range documents.Data {
-		fmt.Printf("title: %s\n", d.Title)
+	data, err := huge.ToIndentJSON(&documents.Data)
+	if err != nil {
+		return err
 	}
+	fmt.Println(data)
 
 	return nil
 }

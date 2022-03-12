@@ -1,6 +1,10 @@
 package internal
 
 import (
+	"fmt"
+	"os"
+
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
@@ -14,8 +18,13 @@ func NewClient(token string) *Client {
 	}
 }
 
-func (c *Client) IsLogin() bool {
-	return viper.GetString("token") != ""
+func (c *Client) CheckLogin() func(cmd *cobra.Command, args []string) {
+	return func(cmd *cobra.Command, args []string) {
+		if viper.GetString("token") == "" {
+			fmt.Println(ErrNoLogin)
+			os.Exit(1)
+		}
+	}
 }
 
 func (c *Client) Login(token string) error {

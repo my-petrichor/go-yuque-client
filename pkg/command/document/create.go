@@ -42,7 +42,11 @@ func runCreate(client *internal.Client, namespace string, opts *createOptions) e
 		return internal.ErrNoLogin
 	}
 
-	_, err := yuque.NewClient(client.Token).Document.Create(namespace, yuque.DocumentOption{
+	c, err := yuque.NewClient(client.Token)
+	if err != nil {
+		return err
+	}
+	_, err = c.Document.Create(namespace, yuque.DocumentOption{
 		Format: opts.format,
 		Public: opts.public,
 		Body:   opts.body,

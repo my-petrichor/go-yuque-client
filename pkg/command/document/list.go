@@ -44,7 +44,11 @@ func runList(client *internal.Client, namespace string, opts *createOptions) err
 		return internal.ErrNoLogin
 	}
 
-	documents, err := yuque.NewClient(client.Token).Document.ListAll(namespace)
+	c, err := yuque.NewClient(client.Token)
+	if err != nil {
+		return err
+	}
+	documents, err := c.Document.ListAll(namespace)
 	if err != nil {
 		return err
 	}

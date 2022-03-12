@@ -37,7 +37,12 @@ func runUpdate(client *internal.Client, groupLogin string, opts *UpdateOptions) 
 	if !client.IsLogin() {
 		return internal.ErrNoLogin
 	}
-	_, err := yuque.NewClient(client.Token).Group.Update(groupLogin, yuque.GroupOption{
+
+	c, err := yuque.NewClient(client.Token)
+	if err != nil {
+		return err
+	}
+	_, err = c.Group.Update(groupLogin, yuque.GroupOption{
 		Name:        opts.name,
 		Login:       opts.login,
 		Description: opts.description,

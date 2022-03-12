@@ -48,8 +48,10 @@ func runCreate(client *internal.Client, opts *createOptions) error {
 		return internal.ErrNoLogin
 	}
 
-	var err error
-	c := yuque.NewClient(client.Token)
+	c, err := yuque.NewClient(client.Token)
+	if err != nil {
+		return err
+	}
 	yuqueOption := yuque.RepoOption{
 		Description: opts.description,
 		Public:      opts.public,

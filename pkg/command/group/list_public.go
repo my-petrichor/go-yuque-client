@@ -27,7 +27,11 @@ func runListPublic(client *internal.Client) error {
 		return internal.ErrNoLogin
 	}
 
-	groups, err := yuque.NewClient(client.Token).Group.ListPublic()
+	c, err := yuque.NewClient(client.Token)
+	if err != nil {
+		return err
+	}
+	groups, err := c.Group.ListPublic()
 	if err != nil {
 		return err
 	}

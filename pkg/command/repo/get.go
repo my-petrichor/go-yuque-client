@@ -25,7 +25,11 @@ func runGet(client *internal.Client, namespace string) error {
 		return internal.ErrNoLogin
 	}
 
-	_, err := yuque.NewClient(client.Token).Repo.GetInfo(namespace)
+	c, err := yuque.NewClient(client.Token)
+	if err != nil {
+		return err
+	}
+	_, err = c.Repo.GetInfo(namespace)
 
 	return err
 }

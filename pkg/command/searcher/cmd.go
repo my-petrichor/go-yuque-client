@@ -38,7 +38,11 @@ func runSearcher(client *internal.Client, keyWord string, opts *searcherOptions)
 		return internal.ErrNoLogin
 	}
 
-	s, err := yuque.NewClient(client.Token).Search.Work(keyWord, yuque.SearcherOption{
+	c, err := yuque.NewClient(client.Token)
+	if err != nil {
+		return err
+	}
+	s, err := c.Search.Work(keyWord, yuque.SearcherOption{
 		Kind:   opts.kind,
 		Offset: opts.offset,
 	})

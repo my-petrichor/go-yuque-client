@@ -36,7 +36,11 @@ func runGet(client *internal.Client, opts *getOptions) error {
 		return internal.ErrNoLogin
 	}
 
-	u, err := yuque.NewClient(client.Token).User.GetInfo()
+	c, err := yuque.NewClient(client.Token)
+	if err != nil {
+		return err
+	}
+	u, err := c.User.GetInfo()
 	if err != nil {
 		return err
 	}

@@ -48,7 +48,11 @@ func runUpdate(client *internal.Client, path string, opts *updateOptions) error 
 	if err != nil {
 		return err
 	}
-	c := yuque.NewClient(client.Token)
+
+	c, err := yuque.NewClient(client.Token)
+	if err != nil {
+		return err
+	}
 	_, err = c.Document.Update(namespace, slug, yuque.DocumentOption{
 		Format:   opts.format,
 		Public:   opts.public,

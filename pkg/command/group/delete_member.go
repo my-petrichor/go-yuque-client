@@ -7,26 +7,38 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type deleteMemberOptions struct {
+	groupLogin string
+}
+
 func newDeleteMemberCommand(client *internal.Client) *cobra.Command {
-	var opts createOptions
+	var opts deleteMemberOptions
 
 	cmd := &cobra.Command{
-		Use:   "delete_member GROUPLOGIN",
+		Use:   "delete_member LOGIN",
 		Short: "Delete a group member",
 		Args:  command.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runCreate(client, args[0], &opts)
+			return runDeleteMember(client, args[0], &opts)
 		},
 	}
+
+	flags := cmd.Flags()
+	flags.StringVarP(&opts.groupLogin, "group_login", "g", "", "Login of group")
 
 	return cmd
 }
 
-func runDeleteMember(client *internal.Client, groupLogin string) error {
+func runDeleteMember(client *internal.Client, login string, opts *deleteMemberOptions) error {
 	if !client.IsLogin() {
 		return internal.ErrNoLogin
 	}
-	_, err := yuque.NewClient(client.Token).Group.DeleteMember(groupLogin)
+
+	c, err := yuque.NewClient(client.Token)
+	if err != nil {
+		return err
+	}
+	_, err = c.Group.DeleteMember(opts.groupLogin, login)
 
 	return err
 }

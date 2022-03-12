@@ -43,7 +43,10 @@ func runUpdate(client *internal.Client, namespace string, opts *updateOptions) e
 		return internal.ErrNoLogin
 	}
 
-	c := yuque.NewClient(client.Token)
+	c, err := yuque.NewClient(client.Token)
+	if err != nil {
+		return err
+	}
 	yuqueOption := yuque.RepoOption{
 		Slug:        opts.slug,
 		Name:        opts.name,
@@ -51,7 +54,7 @@ func runUpdate(client *internal.Client, namespace string, opts *updateOptions) e
 		Public:      opts.public,
 		Kind:        opts.kind,
 	}
-	_, err := c.Repo.Update(namespace, yuqueOption)
+	_, err = c.Repo.Update(namespace, yuqueOption)
 
 	return err
 }

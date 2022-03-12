@@ -1,13 +1,17 @@
 package internal
 
-import "github.com/spf13/viper"
+import (
+	"github.com/spf13/viper"
+)
 
 type Client struct {
 	Token string
 }
 
-func NewClient() *Client {
-	return &Client{}
+func NewClient(token string) *Client {
+	return &Client{
+		Token: token,
+	}
 }
 
 func (c *Client) IsLogin() bool {

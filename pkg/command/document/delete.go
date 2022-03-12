@@ -24,11 +24,17 @@ func runDelete(client *internal.Client, path string) error {
 	if !client.IsLogin() {
 		return internal.ErrNoLogin
 	}
+
 	namespace, slug, err := splitPath(path)
 	if err != nil {
 		return err
 	}
-	_, err = yuque.NewClient(client.Token).Document.Delete(namespace, slug)
+
+	c, err := yuque.NewClient(client.Token)
+	if err != nil {
+		return err
+	}
+	_, err = c.Document.Delete(namespace, slug)
 
 	return err
 }

@@ -17,9 +17,18 @@ var (
 
 {{- if not .HasSubCommands}}  {{.UseLine}}{{end}}
 {{- if .HasSubCommands}}  {{ .CommandPath}}{{- if .HasAvailableFlags}} [OPTIONS]{{end}} COMMAND{{end}}
+
+{{if ne .Long ""}}{{ .Long | trim }}{{ else }}{{ .Short | trim }}{{end}}
 	
+{{- if .HasAvailableFlags}}
+
+Options:
+{{.LocalFlags.FlagUsages | trimTrailingWhitespaces}}
+
+{{- end}}
+
 {{- if hasManagementSubCommands . }}
-	
+
 Management Commands:
 	
 {{- range managementSubCommands . }}
@@ -62,56 +71,6 @@ func DisableFlagsInUseLine(cmd *cobra.Command) {
 	})
 }
 
-func setupHelpCommand(rootCmd, helpCmd *cobra.Command) {
-	origRun := helpCmd.Run
-	origRunE := helpCmd.RunE
-
-	helpCmd.Run = nil
-	helpCmd.RunE = func(c *cobra.Command, args []string) error {
-		if origRunE != nil {
-			return origRunE(c, args)
-		}
-		origRun(c, args)
-		return nil
-	}
-}
-
-func runYuque(client *internal.Client) error {
-	cmd := &cobra.Command{
-		Use:                   "yuque [OPTIONS] COMMAND [ARG...]",
-		Short:                 "A simple yuque application manage tool",
-		SilenceUsage:          true,
-		SilenceErrors:         true,
-		TraverseChildren:      true,
-		DisableFlagsInUseLine: true,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) == 0 {
-				return command.ShowHelp()(cmd, args)
-			}
-			return fmt.Errorf("yuque: '%s' is not a yuque command.\nSee 'yuque --help'", args[0])
-		},
-	}
-
-	cmd.PersistentFlags().StringVar(&config.ConfigFile, "config", "", "Location of client config file (default $HOME/.config.yaml)")
-
-	cobra.OnInitialize(config.Init)
-	client.Token = viper.GetString("token")
-
-	cobra.AddTemplateFunc("add", func(a, b int) int { return a + b })
-	cobra.AddTemplateFunc("hasSubCommands", hasSubCommands)
-	cobra.AddTemplateFunc("hasManagementSubCommands", hasManagementSubCommands)
-	cobra.AddTemplateFunc("operationSubCommands", operationSubCommands)
-	cobra.AddTemplateFunc("managementSubCommands", managementSubCommands)
-
-	cmd.SetUsageTemplate(usageTemplate)
-	cmd.SetHelpTemplate(helpTemplate)
-
-	DisableFlagsInUseLine(cmd)
-	commands.AddCommands(client, cmd)
-
-	return cmd.Execute()
-}
-
 func hasSubCommands(cmd *cobra.Command) bool {
 	return len(operationSubCommands(cmd)) > 0
 }
@@ -140,8 +99,44 @@ func managementSubCommands(cmd *cobra.Command) []*cobra.Command {
 	return cmds
 }
 
+func runYuque(client *internal.Client) error {
+	cmd := &cobra.Command{
+		Use:           "yuque [OPTIONS] COMMAND [ARG...]",
+		Short:         "A simple yuque application manage tool",
+		SilenceUsage:  true,
+		SilenceErrors: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				return command.ShowHelp()(cmd, args)
+			}
+			return fmt.Errorf("yuque: '%s' is not a yuque command.\nSee 'yuque --help'", args[0])
+		},
+		DisableFlagsInUseLine: true,
+	}
+
+	cmd.PersistentFlags().StringVar(&config.ConfigFile, "config", "", "Location of client config file (default $HOME/.config.yaml)")
+	// cmd.PersistentFlags().BoolP("help", "h", false, "Print usage")
+	// cmd.PersistentFlags().MarkShorthandDeprecated("help", "please use --help")
+	// cmd.PersistentFlags().Lookup("help").Hidden = true
+
+	cobra.AddTemplateFunc("add", func(a, b int) int { return a + b })
+	cobra.AddTemplateFunc("hasSubCommands", hasSubCommands)
+	cobra.AddTemplateFunc("hasManagementSubCommands", hasManagementSubCommands)
+	cobra.AddTemplateFunc("operationSubCommands", operationSubCommands)
+	cobra.AddTemplateFunc("managementSubCommands", managementSubCommands)
+
+	cmd.SetUsageTemplate(usageTemplate)
+	cmd.SetHelpTemplate(helpTemplate)
+
+	commands.AddCommands(client, cmd)
+	DisableFlagsInUseLine(cmd)
+
+	return cmd.Execute()
+}
+
 func main() {
-	client := internal.NewClient()
+	config.Init()
+	client := internal.NewClient(viper.GetString("token"))
 
 	if err := runYuque(client); err != nil {
 		log.Fatalln(err)

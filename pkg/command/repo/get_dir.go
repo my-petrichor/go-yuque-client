@@ -25,7 +25,11 @@ func runGetDir(client *internal.Client, namespace string) error {
 		return internal.ErrNoLogin
 	}
 
-	_, err := yuque.NewClient(client.Token).Repo.GetDir(namespace)
+	c, err := yuque.NewClient(client.Token)
+	if err != nil {
+		return err
+	}
+	_, err = c.Repo.GetDir(namespace)
 
 	return err
 }

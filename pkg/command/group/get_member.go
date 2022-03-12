@@ -26,7 +26,12 @@ func runGetMember(client *internal.Client, groupLogin string) error {
 	if !client.IsLogin() {
 		return internal.ErrNoLogin
 	}
-	g, err := yuque.NewClient(client.Token).Group.GetMember(groupLogin)
+
+	c, err := yuque.NewClient(client.Token)
+	if err != nil {
+		return err
+	}
+	g, err := c.Group.GetMember(groupLogin)
 	if err != nil {
 		return err
 	}

@@ -35,7 +35,12 @@ func runCreate(client *internal.Client, groupLogin string, opts *createOptions) 
 	if !client.IsLogin() {
 		return internal.ErrNoLogin
 	}
-	_, err := yuque.NewClient(client.Token).Group.Create(groupLogin, opts.groupName, yuque.GroupOption{
+
+	c, err := yuque.NewClient(client.Token)
+	if err != nil {
+		return err
+	}
+	_, err = c.Group.Create(groupLogin, opts.groupName, yuque.GroupOption{
 		Description: opts.description,
 	})
 

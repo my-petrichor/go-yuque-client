@@ -1,7 +1,6 @@
 package group
 
 import (
-	"errors"
 	"strconv"
 
 	yuque "github.com/my-Sakura/go-yuque-api"
@@ -12,6 +11,7 @@ import (
 
 type UpdateMemberOptions struct {
 	groupLogin string
+	login      string
 }
 
 func newUpdateMemberCommand(client *internal.Client) *cobra.Command {
@@ -19,7 +19,7 @@ func newUpdateMemberCommand(client *internal.Client) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "update_member [OPTIONS] ROLE",
-		Short: "Update group member authority (0 - manager, 1 - ordinary), (must set group_login flag)",
+		Short: "Update group member authority (0 - manager, 1 - ordinary), (must set group_login and login flag)",
 		Args:  command.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			role, err := strconv.Atoi(args[0])
@@ -32,6 +32,7 @@ func newUpdateMemberCommand(client *internal.Client) *cobra.Command {
 
 	flags := cmd.Flags()
 	flags.StringVarP(&opts.groupLogin, "group_login", "g", "", "Login of group")
+	flags.StringVarP(&opts.login, "login", "l", "", "Login of user who need to update")
 
 	return cmd
 }
@@ -40,14 +41,12 @@ func runUpdateMember(client *internal.Client, role int, opts *UpdateMemberOption
 	if !client.IsLogin() {
 		return internal.ErrNoLogin
 	}
-	if opts.groupLogin == "" {
-		return errors.New("No set group_login flag")
-	} else if opts.groupLogin == "" {
-		return errors.New("No set group_login flag")
-	}
 
-	c := yuque.NewClient(client.Token)
-	_, err := c.Group.UpdateMember(opts.groupLogin, role)
+	c, err := yuque.NewClient(client.Token)
+	if err != nil {
+		return err
+	}
+	_, err = c.Group.UpdateMember(opts.groupLogin, opts.login, role)
 
 	return err
 }

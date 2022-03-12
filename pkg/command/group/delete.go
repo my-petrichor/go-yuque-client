@@ -24,7 +24,12 @@ func runDelete(client *internal.Client, groupLogin string) error {
 	if !client.IsLogin() {
 		return internal.ErrNoLogin
 	}
-	_, err := yuque.NewClient(client.Token).Group.Delete(groupLogin)
+
+	c, err := yuque.NewClient(client.Token)
+	if err != nil {
+		return err
+	}
+	_, err = c.Group.Delete(groupLogin)
 
 	return err
 }

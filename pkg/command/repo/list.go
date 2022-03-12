@@ -35,8 +35,12 @@ func runList(client *internal.Client, opts *listOptions) error {
 	if !client.IsLogin() {
 		return internal.ErrNoLogin
 	}
-	var err error
-	c := yuque.NewClient(client.Token)
+
+	c, err := yuque.NewClient(client.Token)
+	if err != nil {
+		return err
+	}
+
 	if opts.userOrGroup == 0 {
 		_, err = c.Repo.ListAllUnderUser()
 	} else if opts.userOrGroup == 1 {

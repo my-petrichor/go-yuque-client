@@ -12,50 +12,49 @@ import (
 	"github.com/spf13/viper"
 )
 
-var (
-	usageTemplate = `Usage:
+func main() {
+	config.Init()
+	client := internal.NewClient(viper.GetString("token"))
 
-{{- if not .HasSubCommands}}  {{.UseLine}}{{end}}
-{{- if .HasSubCommands}}  {{ .CommandPath}}{{- if .HasAvailableFlags}} [OPTIONS]{{end}} COMMAND{{end}}
+	if err := runYuque(client); err != nil {
+		log.Fatalln(err)
+	}
+}
 
-{{if ne .Long ""}}{{ .Long | trim }}{{ else }}{{ .Short | trim }}{{end}}
-	
-{{- if .HasAvailableFlags}}
+func runYuque(client *internal.Client) error {
+	cmd := &cobra.Command{
+		Use:           "yuque [OPTIONS] COMMAND [ARG...]",
+		Short:         "A simple yuque application manage tool",
+		SilenceUsage:  true,
+		SilenceErrors: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 {
+				return command.ShowHelp()(cmd, args)
+			}
+			return fmt.Errorf("yuque: '%s' is not a yuque command.\nSee 'yuque --help'", args[0])
+		},
+		DisableFlagsInUseLine: true,
+	}
 
-Options:
-{{.LocalFlags.FlagUsages | trimTrailingWhitespaces}}
+	cmd.PersistentFlags().StringVar(&config.ConfigFile, "config", "", "Location of client config file (default $HOME/.config.yaml)")
+	// cmd.PersistentFlags().BoolP("help", "h", false, "Print usage")
+	// cmd.PersistentFlags().MarkShorthandDeprecated("help", "please use --help")
+	// cmd.PersistentFlags().Lookup("help").Hidden = true
 
-{{- end}}
+	cobra.AddTemplateFunc("add", func(a, b int) int { return a + b })
+	cobra.AddTemplateFunc("hasSubCommands", hasSubCommands)
+	cobra.AddTemplateFunc("hasManagementSubCommands", hasManagementSubCommands)
+	cobra.AddTemplateFunc("operationSubCommands", operationSubCommands)
+	cobra.AddTemplateFunc("managementSubCommands", managementSubCommands)
 
-{{- if hasManagementSubCommands . }}
+	cmd.SetUsageTemplate(usageTemplate)
+	cmd.SetHelpTemplate(helpTemplate)
 
-Management Commands:
-	
-{{- range managementSubCommands . }}
-  {{rpad .Name .NamePadding }} {{.Short}}
-{{- end}}
-	
-{{- end}}
+	commands.AddCommands(client, cmd)
+	DisableFlagsInUseLine(cmd)
 
-{{- if hasSubCommands .}}
-	
-Commands:
-	
-{{- range operationSubCommands . }}
-  {{rpad .Name .NamePadding }} {{.Short}}
-{{- end}}
-
-{{- end}}
-	
-{{- if .HasSubCommands }}
-	
-Run '{{.CommandPath}} COMMAND --help' for more information on a command.
-{{- end}}
-	`
-
-	helpTemplate = `
-{{if or .Runnable .HasSubCommands}}{{.UsageString}}{{end}}`
-)
+	return cmd.Execute()
+}
 
 func VisitAll(root *cobra.Command, fn func(*cobra.Command)) {
 	for _, cmd := range root.Commands() {
@@ -97,48 +96,4 @@ func managementSubCommands(cmd *cobra.Command) []*cobra.Command {
 		}
 	}
 	return cmds
-}
-
-func runYuque(client *internal.Client) error {
-	cmd := &cobra.Command{
-		Use:           "yuque [OPTIONS] COMMAND [ARG...]",
-		Short:         "A simple yuque application manage tool",
-		SilenceUsage:  true,
-		SilenceErrors: true,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) == 0 {
-				return command.ShowHelp()(cmd, args)
-			}
-			return fmt.Errorf("yuque: '%s' is not a yuque command.\nSee 'yuque --help'", args[0])
-		},
-		DisableFlagsInUseLine: true,
-	}
-
-	cmd.PersistentFlags().StringVar(&config.ConfigFile, "config", "", "Location of client config file (default $HOME/.config.yaml)")
-	// cmd.PersistentFlags().BoolP("help", "h", false, "Print usage")
-	// cmd.PersistentFlags().MarkShorthandDeprecated("help", "please use --help")
-	// cmd.PersistentFlags().Lookup("help").Hidden = true
-
-	cobra.AddTemplateFunc("add", func(a, b int) int { return a + b })
-	cobra.AddTemplateFunc("hasSubCommands", hasSubCommands)
-	cobra.AddTemplateFunc("hasManagementSubCommands", hasManagementSubCommands)
-	cobra.AddTemplateFunc("operationSubCommands", operationSubCommands)
-	cobra.AddTemplateFunc("managementSubCommands", managementSubCommands)
-
-	cmd.SetUsageTemplate(usageTemplate)
-	cmd.SetHelpTemplate(helpTemplate)
-
-	commands.AddCommands(client, cmd)
-	DisableFlagsInUseLine(cmd)
-
-	return cmd.Execute()
-}
-
-func main() {
-	config.Init()
-	client := internal.NewClient(viper.GetString("token"))
-
-	if err := runYuque(client); err != nil {
-		log.Fatalln(err)
-	}
 }

@@ -2,33 +2,32 @@ package group
 
 import (
 	"fmt"
-	"os"
 
 	yuque "github.com/my-Sakura/go-yuque-api"
+	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
 	"github.com/spf13/cobra"
 )
 
-func newListPublicCommand() *cobra.Command {
+func newListPublicCommand(client *internal.Client) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list_public [OPTIONS]",
 		Short: "List all public group",
 		Args:  command.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runListPublic()
+			return runListPublic(client)
 		},
 	}
 
 	return cmd
 }
 
-func runListPublic() error {
-	// if !command.Login() {
-	// 	return internal.ErrNoLogin
-	// }
-	token := os.Getenv("token")
-	c := yuque.NewClient(token)
-	groups, err := c.Group.ListPublic()
+func runListPublic(client *internal.Client) error {
+	if !client.IsLogin() {
+		return internal.ErrNoLogin
+	}
+
+	groups, err := yuque.NewClient(client.Token).Group.ListPublic()
 	if err != nil {
 		return err
 	}

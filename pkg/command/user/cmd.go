@@ -1,11 +1,12 @@
 package user
 
 import (
+	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
 	"github.com/spf13/cobra"
 )
 
-func NewUserCommand() *cobra.Command {
+func NewUserCommand(client *internal.Client) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "user",
 		Short: "Manage user",
@@ -13,7 +14,7 @@ func NewUserCommand() *cobra.Command {
 		RunE:  command.ShowHelp(),
 	}
 	cmd.AddCommand(
-		newGetCommand(),
+		newGetCommand(client),
 	)
 
 	return cmd

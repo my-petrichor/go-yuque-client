@@ -1,9 +1,8 @@
 package document
 
 import (
-	"os"
-
 	yuque "github.com/my-Sakura/go-yuque-api"
+	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
 	"github.com/spf13/cobra"
 )
@@ -16,7 +15,7 @@ type createOptions struct {
 	public int
 }
 
-func newCreateCommand() *cobra.Command {
+func newCreateCommand(client *internal.Client) *cobra.Command {
 	var opts createOptions
 
 	cmd := &cobra.Command{
@@ -24,7 +23,7 @@ func newCreateCommand() *cobra.Command {
 		Short: "Create a document",
 		Args:  command.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runCreate(args[0], &opts)
+			return runCreate(client, args[0], &opts)
 		},
 	}
 
@@ -38,13 +37,12 @@ func newCreateCommand() *cobra.Command {
 	return cmd
 }
 
-func runCreate(namespace string, opts *createOptions) error {
-	// if !command.Login() {
-	// 	return internal.ErrNoLogin
-	// }
-	token := os.Getenv("token")
-	c := yuque.NewClient(token)
-	_, err := c.Document.Create(namespace, yuque.DocumentOption{
+func runCreate(client *internal.Client, namespace string, opts *createOptions) error {
+	if !client.IsLogin() {
+		return internal.ErrNoLogin
+	}
+
+	_, err := yuque.NewClient(client.Token).Document.Create(namespace, yuque.DocumentOption{
 		Format: opts.format,
 		Public: opts.public,
 		Body:   opts.body,

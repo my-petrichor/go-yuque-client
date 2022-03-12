@@ -1,42 +1,31 @@
 package repo
 
 import (
-	"os"
-
 	yuque "github.com/my-Sakura/go-yuque-api"
+	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
 	"github.com/spf13/cobra"
 )
 
-type getDirOptions struct {
-	namespace string
-}
-
-func newGetDirCommand() *cobra.Command {
-	var opts getDirOptions
-
+func newGetDirCommand(client *internal.Client) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get_dir [OPTIONS]",
-		Short: "Get repo dir (must set namespace flag)",
-		Args:  command.NoArgs,
+		Use:   "get_dir [OPTIONS] NAMESPACE",
+		Short: "Get repo dir",
+		Args:  command.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runGetDir(&opts)
+			return runGetDir(client, args[0])
 		},
 	}
-
-	flags := cmd.Flags()
-	flags.StringVarP(&opts.namespace, "namespace", "n", "", "Namespace of repo")
 
 	return cmd
 }
 
-func runGetDir(opts *getDirOptions) error {
-	// if !command.Login() {
-	// 	return internal.ErrNoLogin
-	// }
+func runGetDir(client *internal.Client, namespace string) error {
+	if !client.IsLogin() {
+		return internal.ErrNoLogin
+	}
 
-	token := os.Getenv("token")
-	_, err := yuque.NewClient(token).Repo.GetDir(opts.namespace)
+	_, err := yuque.NewClient(client.Token).Repo.GetDir(namespace)
 
 	return err
 }

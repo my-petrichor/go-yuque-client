@@ -1,36 +1,34 @@
 package document
 
 import (
-	"os"
-
 	yuque "github.com/my-Sakura/go-yuque-api"
+	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
 	"github.com/spf13/cobra"
 )
 
-func newDeleteCommand() *cobra.Command {
+func newDeleteCommand(client *internal.Client) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete [OPTIONS] PATH",
 		Short: "Delete a document",
 		Args:  command.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runDelete(args[0])
+			return runDelete(client, args[0])
 		},
 	}
 
 	return cmd
 }
 
-func runDelete(path string) error {
-	// if !command.Login() {
-	// 	return internal.ErrNoLogin
-	// }
+func runDelete(client *internal.Client, path string) error {
+	if !client.IsLogin() {
+		return internal.ErrNoLogin
+	}
 	namespace, slug, err := splitPath(path)
 	if err != nil {
 		return err
 	}
-	token := os.Getenv("token")
-	_, err = yuque.NewClient(token).Document.Delete(namespace, slug)
+	_, err = yuque.NewClient(client.Token).Document.Delete(namespace, slug)
 
 	return err
 }

@@ -1,11 +1,12 @@
 package document
 
 import (
+	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
 	"github.com/spf13/cobra"
 )
 
-func NewDocumentCommand() *cobra.Command {
+func NewDocumentCommand(client *internal.Client) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "document",
 		Short: "Manage document",
@@ -13,11 +14,11 @@ func NewDocumentCommand() *cobra.Command {
 		RunE:  command.ShowHelp(),
 	}
 	cmd.AddCommand(
-		newListCommand(),
-		newGetCommand(),
-		newCreateCommand(),
-		newUpdateCommand(),
-		newDeleteCommand(),
+		newListCommand(client),
+		newGetCommand(client),
+		newCreateCommand(client),
+		newUpdateCommand(client),
+		newDeleteCommand(client),
 	)
 
 	return cmd

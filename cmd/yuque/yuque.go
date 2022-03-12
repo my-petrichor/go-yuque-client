@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
 	"github.com/my-Sakura/go-yuque-client/pkg/command/commands"
 	"github.com/my-Sakura/go-yuque-client/pkg/config"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -74,7 +76,7 @@ func setupHelpCommand(rootCmd, helpCmd *cobra.Command) {
 	}
 }
 
-func runYuque() error {
+func runYuque(client *internal.Client) error {
 	cmd := &cobra.Command{
 		Use:                   "yuque [OPTIONS] COMMAND [ARG...]",
 		Short:                 "A simple yuque application manage tool",
@@ -93,6 +95,7 @@ func runYuque() error {
 	cmd.PersistentFlags().StringVar(&config.ConfigFile, "config", "", "Location of client config file (default $HOME/.config.yaml)")
 
 	cobra.OnInitialize(config.Init)
+	client.Token = viper.GetString("token")
 
 	cobra.AddTemplateFunc("add", func(a, b int) int { return a + b })
 	cobra.AddTemplateFunc("hasSubCommands", hasSubCommands)
@@ -104,7 +107,7 @@ func runYuque() error {
 	cmd.SetHelpTemplate(helpTemplate)
 
 	DisableFlagsInUseLine(cmd)
-	commands.AddCommands(cmd)
+	commands.AddCommands(client, cmd)
 
 	return cmd.Execute()
 }
@@ -138,7 +141,9 @@ func managementSubCommands(cmd *cobra.Command) []*cobra.Command {
 }
 
 func main() {
-	if err := runYuque(); err != nil {
+	client := internal.NewClient()
+
+	if err := runYuque(client); err != nil {
 		log.Fatalln(err)
 	}
 }

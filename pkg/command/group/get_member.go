@@ -2,33 +2,31 @@ package group
 
 import (
 	"fmt"
-	"os"
 
 	yuque "github.com/my-Sakura/go-yuque-api"
+	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
 	"github.com/spf13/cobra"
 )
 
-func newGetMemberCommand() *cobra.Command {
+func newGetMemberCommand(client *internal.Client) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get_member [OPTIONS] GROUPLOGIN",
+		Use:   "get_member GROUPLOGIN",
 		Short: "Get a group member info",
 		Args:  command.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runGetMember(args[0])
+			return runGetMember(client, args[0])
 		},
 	}
 
 	return cmd
 }
 
-func runGetMember(groupLogin string) error {
-	// if !command.Login() {
-	// 	return internal.ErrNoLogin
-	// }
-	token := os.Getenv("token")
-	c := yuque.NewClient(token)
-	g, err := c.Group.GetMembers(groupLogin)
+func runGetMember(client *internal.Client, groupLogin string) error {
+	if !client.IsLogin() {
+		return internal.ErrNoLogin
+	}
+	g, err := yuque.NewClient(client.Token).Group.GetMember(groupLogin)
 	if err != nil {
 		return err
 	}

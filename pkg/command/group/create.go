@@ -1,46 +1,43 @@
 package group
 
 import (
-	"errors"
-	"os"
-
 	yuque "github.com/my-Sakura/go-yuque-api"
+	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
 	"github.com/spf13/cobra"
 )
 
 type createOptions struct {
-	groupLogin string
+	groupName   string
+	description string
 }
 
-func newCreateCommand() *cobra.Command {
+func newCreateCommand(client *internal.Client) *cobra.Command {
 	var opts createOptions
 
 	cmd := &cobra.Command{
-		Use:   "create [OPTIONS] NAME",
+		Use:   "create [OPTIONS] GROUPLOGIN",
 		Short: "Create a group",
 		Args:  command.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runCreate(args[0], &opts)
+			return runCreate(client, args[0], &opts)
 		},
 	}
 
 	flags := cmd.Flags()
-	flags.StringVarP(&opts.groupLogin, "group_login", "g", "", "Login of group")
+	flags.StringVarP(&opts.groupName, "name", "n", "", "Name of group")
+	flags.StringVarP(&opts.description, "description", "d", "", "Description of group")
 
 	return cmd
 }
 
-func runCreate(name string, opts *createOptions) error {
-	// if !command.Login() {
-	// 	return internal.ErrNoLogin
-	// }
-	token := os.Getenv("token")
-	if opts.groupLogin == "" {
-		return errors.New("No set group_login")
+func runCreate(client *internal.Client, groupLogin string, opts *createOptions) error {
+	if !client.IsLogin() {
+		return internal.ErrNoLogin
 	}
-	c := yuque.NewClient(token)
-	_, err := c.Group.Create(name, opts.groupLogin, yuque.GroupOption{})
+	_, err := yuque.NewClient(client.Token).Group.Create(groupLogin, opts.groupName, yuque.GroupOption{
+		Description: opts.description,
+	})
 
 	return err
 }

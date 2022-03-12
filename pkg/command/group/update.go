@@ -1,9 +1,8 @@
 package group
 
 import (
-	"os"
-
 	yuque "github.com/my-Sakura/go-yuque-api"
+	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
 	"github.com/spf13/cobra"
 )
@@ -14,7 +13,7 @@ type UpdateOptions struct {
 	description string
 }
 
-func newUpdateCommand() *cobra.Command {
+func newUpdateCommand(client *internal.Client) *cobra.Command {
 	var opts UpdateOptions
 
 	cmd := &cobra.Command{
@@ -22,7 +21,7 @@ func newUpdateCommand() *cobra.Command {
 		Short: "Update group that user join in",
 		Args:  command.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runUpdate(args[0], &opts)
+			return runUpdate(client, args[0], &opts)
 		},
 	}
 
@@ -34,12 +33,11 @@ func newUpdateCommand() *cobra.Command {
 	return cmd
 }
 
-func runUpdate(groupLogin string, opts *UpdateOptions) error {
-	// if !command.Login() {
-	// 	return internal.ErrNoLogin
-	// }
-	token := os.Getenv("token")
-	_, err := yuque.NewClient(token).Group.Update(groupLogin, yuque.GroupOption{
+func runUpdate(client *internal.Client, groupLogin string, opts *UpdateOptions) error {
+	if !client.IsLogin() {
+		return internal.ErrNoLogin
+	}
+	_, err := yuque.NewClient(client.Token).Group.Update(groupLogin, yuque.GroupOption{
 		Name:        opts.name,
 		Login:       opts.login,
 		Description: opts.description,

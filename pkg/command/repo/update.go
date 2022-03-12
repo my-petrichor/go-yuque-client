@@ -1,15 +1,13 @@
 package repo
 
 import (
-	"os"
-
 	yuque "github.com/my-Sakura/go-yuque-api"
+	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
 	"github.com/spf13/cobra"
 )
 
 type updateOptions struct {
-	namespace   string
 	slug        string
 	kind        string
 	name        string
@@ -17,20 +15,19 @@ type updateOptions struct {
 	public      int
 }
 
-func newUpdateCommand() *cobra.Command {
+func newUpdateCommand(client *internal.Client) *cobra.Command {
 	var opts updateOptions
 
 	cmd := &cobra.Command{
-		Use:   "update [OPTIONS]",
-		Short: "Update a repo (must set namespace flag)",
-		Args:  command.NoArgs,
+		Use:   "update [OPTIONS] NAMESPACE",
+		Short: "Update a repo",
+		Args:  command.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runUpdate(&opts)
+			return runUpdate(client, args[0], &opts)
 		},
 	}
 
 	flags := cmd.Flags()
-	flags.StringVarP(&opts.namespace, "namespace", "n", "", "Namespace of repo")
 	flags.StringVarP(&opts.slug, "slug", "s", "", "Slug of repo")
 	flags.StringVarP(&opts.kind, "type", "t", "Book", "Type of repo (Book, Design, Sheet, Column, Resource, Thread) default Book")
 	flags.StringVar(&opts.name, "name", "", "Name of repo")
@@ -41,13 +38,12 @@ func newUpdateCommand() *cobra.Command {
 	return cmd
 }
 
-func runUpdate(opts *updateOptions) error {
-	// if !command.Login() {
-	// 	return internal.ErrNoLogin
-	// }
+func runUpdate(client *internal.Client, namespace string, opts *updateOptions) error {
+	if !client.IsLogin() {
+		return internal.ErrNoLogin
+	}
 
-	token := os.Getenv("token")
-	c := yuque.NewClient(token)
+	c := yuque.NewClient(client.Token)
 	yuqueOption := yuque.RepoOption{
 		Slug:        opts.slug,
 		Name:        opts.name,
@@ -55,7 +51,7 @@ func runUpdate(opts *updateOptions) error {
 		Public:      opts.public,
 		Kind:        opts.kind,
 	}
-	_, err := c.Repo.Update(opts.namespace, yuqueOption)
+	_, err := c.Repo.Update(namespace, yuqueOption)
 
 	return err
 }

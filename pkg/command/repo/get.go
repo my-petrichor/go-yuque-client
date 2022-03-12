@@ -1,42 +1,31 @@
 package repo
 
 import (
-	"os"
-
 	yuque "github.com/my-Sakura/go-yuque-api"
+	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
 	"github.com/spf13/cobra"
 )
 
-type getOptions struct {
-	namespace string
-}
-
-func newGetCommand() *cobra.Command {
-	var opts getOptions
-
+func newGetCommand(client *internal.Client) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get [OPTIONS]",
-		Short: "Get repo info (must set namespace flag)",
-		Args:  command.NoArgs,
+		Use:   "get [OPTIONS] NAMESPACE",
+		Short: "Get repo info",
+		Args:  command.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runGet(&opts)
+			return runGet(client, args[0])
 		},
 	}
-
-	flags := cmd.Flags()
-	flags.StringVarP(&opts.namespace, "namespace", "n", "", "Namespace of repo")
 
 	return cmd
 }
 
-func runGet(opts *getOptions) error {
-	// if !command.Login() {
-	// 	return internal.ErrNoLogin
-	// }
+func runGet(client *internal.Client, namespace string) error {
+	if !client.IsLogin() {
+		return internal.ErrNoLogin
+	}
 
-	token := os.Getenv("token")
-	_, err := yuque.NewClient(token).Repo.GetInfo(opts.namespace)
+	_, err := yuque.NewClient(client.Token).Repo.GetInfo(namespace)
 
 	return err
 }

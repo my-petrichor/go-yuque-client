@@ -1,9 +1,8 @@
 package document
 
 import (
-	"os"
-
 	yuque "github.com/my-Sakura/go-yuque-api"
+	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
 	"github.com/spf13/cobra"
 )
@@ -17,7 +16,7 @@ type updateOptions struct {
 	forceASL int
 }
 
-func newUpdateCommand() *cobra.Command {
+func newUpdateCommand(client *internal.Client) *cobra.Command {
 	var opts updateOptions
 
 	cmd := &cobra.Command{
@@ -25,7 +24,7 @@ func newUpdateCommand() *cobra.Command {
 		Short: "Update a document",
 		Args:  command.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runUpdate(args[0], &opts)
+			return runUpdate(client, args[0], &opts)
 		},
 	}
 
@@ -40,17 +39,16 @@ func newUpdateCommand() *cobra.Command {
 	return cmd
 }
 
-func runUpdate(path string, opts *updateOptions) error {
-	// if !command.Login() {
-	// 	return internal.ErrNoLogin
-	// }
+func runUpdate(client *internal.Client, path string, opts *updateOptions) error {
+	if !client.IsLogin() {
+		return internal.ErrNoLogin
+	}
 
-	token := os.Getenv("token")
 	namespace, slug, err := splitPath(path)
 	if err != nil {
 		return err
 	}
-	c := yuque.NewClient(token)
+	c := yuque.NewClient(client.Token)
 	_, err = c.Document.Update(namespace, slug, yuque.DocumentOption{
 		Format:   opts.format,
 		Public:   opts.public,

@@ -2,9 +2,9 @@ package document
 
 import (
 	"fmt"
-	"os"
 
 	yuque "github.com/my-Sakura/go-yuque-api"
+	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
 	"github.com/spf13/cobra"
 )
@@ -17,7 +17,7 @@ type listOptions struct {
 	public int
 }
 
-func newListCommand() *cobra.Command {
+func newListCommand(client *internal.Client) *cobra.Command {
 	var opts createOptions
 
 	cmd := &cobra.Command{
@@ -25,7 +25,7 @@ func newListCommand() *cobra.Command {
 		Short: "List all document under a repo",
 		Args:  command.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runList(args[0], &opts)
+			return runList(client, args[0], &opts)
 		},
 	}
 
@@ -39,13 +39,12 @@ func newListCommand() *cobra.Command {
 	return cmd
 }
 
-func runList(namespace string, opts *createOptions) error {
-	// if !command.Login() {
-	// 	return internal.ErrNoLogin
-	// }
-	token := os.Getenv("token")
-	c := yuque.NewClient(token)
-	documents, err := c.Document.ListAll(namespace)
+func runList(client *internal.Client, namespace string, opts *createOptions) error {
+	if !client.IsLogin() {
+		return internal.ErrNoLogin
+	}
+
+	documents, err := yuque.NewClient(client.Token).Document.ListAll(namespace)
 	if err != nil {
 		return err
 	}

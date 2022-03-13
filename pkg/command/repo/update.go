@@ -30,11 +30,11 @@ func newUpdateCommand(client *internal.Client) *cobra.Command {
 
 	flags := cmd.Flags()
 	flags.StringVarP(&opts.slug, "slug", "s", "", "Slug of repo")
-	flags.StringVarP(&opts.kind, "type", "t", "Book", "Type of repo (Book, Design, Sheet, Column, Resource, Thread) default Book")
-	flags.StringVar(&opts.name, "name", "", "Name of repo")
+	flags.StringVarP(&opts.kind, "type", "t", "Book", "Type of repo (Book, Design, Sheet, Column, Resource, Thread)")
+	flags.StringVarP(&opts.name, "name", "n", "", "Name of repo")
 	flags.StringVarP(&opts.description, "description", "d", "", "Description of repo")
 	flags.IntVarP(&opts.public, "public", "p", 0,
-		"Public of repo (0 - private, 1 - all user, 2 - space member, 3 - all user under space (include external contact), 4 - only repo) default 0")
+		"Public of repo (0 - private, 1 - all user, 2 - space member, 3 - all user under space (include external contact), 4 - only repo)")
 
 	return cmd
 }

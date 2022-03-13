@@ -1,9 +1,9 @@
 package document
 
 import (
-	"fmt"
+	"os"
+	"text/template"
 
-	huge "github.com/dablelv/go-huge-util"
 	yuque "github.com/my-Sakura/go-yuque-api"
 	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
@@ -51,11 +51,31 @@ func runList(client *internal.Client, namespace string, opts *listOptions) error
 		return err
 	}
 
-	data, err := huge.ToIndentJSON(&documents.Data)
+	var t = `
+{{.ID}}.
+title:  {{.Title}}
+slug:   {{.Slug}}
+   		`
+
+	docInfoTemplate, err := template.New("t").Parse(t)
 	if err != nil {
 		return err
 	}
-	fmt.Println(data)
+
+	for i, doc := range documents.Data {
+		docInfo := struct {
+			ID    int
+			Title string
+			Slug  string
+		}{
+			ID:    i + 1,
+			Title: doc.Title,
+			Slug:  doc.Slug,
+		}
+		if err = docInfoTemplate.Execute(os.Stdout, docInfo); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }

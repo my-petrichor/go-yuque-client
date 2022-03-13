@@ -1,9 +1,9 @@
 package repo
 
 import (
-	"fmt"
+	"os"
+	"text/template"
 
-	huge "github.com/dablelv/go-huge-util"
 	yuque "github.com/my-Sakura/go-yuque-api"
 	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
@@ -12,8 +12,8 @@ import (
 
 func newGetDirCommand(client *internal.Client) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:              "get_dir [OPTIONS] NAMESPACE",
-		Short:            "Get repo dir",
+		Use:              "get_docs [OPTIONS] NAMESPACE",
+		Short:            "Get documents info under the repo",
 		Args:             command.ExactArgs(1),
 		PersistentPreRun: client.CheckLogin(),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -29,16 +29,38 @@ func runGetDir(client *internal.Client, namespace string) error {
 	if err != nil {
 		return err
 	}
-	r, err := c.Repo.GetDir(namespace)
+	documents, err := c.Repo.GetDir(namespace)
 	if err != nil {
 		return err
 	}
 
-	data, err := huge.ToIndentJSON(&r.Data)
-	if err != nil {
-		return err
+	var t = `
+{{.ID}}.
+title: {{.Title}}
+type:  {{.Type}}
+slug:  {{.Slug}}
+`
+
+	for i, doc := range documents.Data {
+		docInfo := struct {
+			ID    int
+			Title string
+			Type  string
+			Slug  string
+		}{
+			ID:    i + 1,
+			Title: doc.Title,
+			Type:  doc.Type,
+			Slug:  doc.Slug,
+		}
+		repoInfoTemplate, err := template.New("t").Parse(t)
+		if err != nil {
+			return err
+		}
+		if err = repoInfoTemplate.Execute(os.Stdout, docInfo); err != nil {
+			return err
+		}
 	}
-	fmt.Println(data)
 
 	return nil
 }

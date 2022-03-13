@@ -27,6 +27,8 @@ func newDeleteMemberCommand(client *internal.Client) *cobra.Command {
 	flags := cmd.Flags()
 	flags.StringVarP(&opts.groupLogin, "group_login", "g", "", "Login of group")
 
+	cmd.MarkFlagRequired("group_login")
+
 	return cmd
 }
 

@@ -1,9 +1,9 @@
 package user
 
 import (
-	"fmt"
+	"os"
+	"text/template"
 
-	huge "github.com/dablelv/go-huge-util"
 	yuque "github.com/my-Sakura/go-yuque-api"
 	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
@@ -30,16 +30,60 @@ func runGet(client *internal.Client) error {
 		return err
 	}
 
-	u, err := c.User.GetInfo()
+	user, err := c.User.GetInfo()
 	if err != nil {
 		return err
 	}
 
-	data, err := huge.ToIndentJSON(&u.Data)
+	var (
+		t = `
+login:              {{.Login}}
+name:        	    {{.Name}}
+description: 	    {{.Description}}
+followersCount:     {{.FollowersCount}}
+followingCount:     {{.FollowingCount}}
+avatarURL:          {{.AvatarURL}}
+reposCount:         {{.ReposCount}}
+publicReposCount:   {{.PublicReposCount}}
+publicTopicsCount:  {{.PublicTopicsCount}}
+public:             {{.Public}}
+createdAt:   	    {{.CreatedAt}}
+updatedAt:    	    {{.UpdatedAt}}
+		`
+
+		userInfo = struct {
+			Login             string
+			Name              string
+			Description       string
+			Public            int
+			CreatedAt         string
+			UpdatedAt         string
+			AvatarURL         string
+			ReposCount        int
+			PublicReposCount  int
+			PublicTopicsCount int
+			FollowersCount    int
+			FollowingCount    int
+		}{
+			Login:             user.Data.Login,
+			Name:              user.Data.Name,
+			Description:       user.Data.Description,
+			Public:            user.Data.Public,
+			CreatedAt:         user.Data.CreatedAt,
+			UpdatedAt:         user.Data.UpdatedAt,
+			AvatarURL:         user.Data.AvatarURL,
+			ReposCount:        user.Data.BooksCount,
+			PublicReposCount:  user.Data.PublicBooksCount,
+			PublicTopicsCount: user.Data.PublicTopicsCount,
+			FollowersCount:    user.Data.FollowersCount,
+			FollowingCount:    user.Data.FollowingCount,
+		}
+	)
+
+	userInfoTemplate, err := template.New("t").Parse(t)
 	if err != nil {
 		return err
 	}
-	fmt.Println(data)
 
-	return nil
+	return userInfoTemplate.Execute(os.Stdout, userInfo)
 }

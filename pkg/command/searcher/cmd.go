@@ -1,9 +1,9 @@
 package searcher
 
 import (
-	"fmt"
+	"os"
+	"text/template"
 
-	huge "github.com/dablelv/go-huge-util"
 	"github.com/my-Sakura/go-yuque-api"
 	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
@@ -13,6 +13,7 @@ import (
 type searcherOptions struct {
 	kind   string
 	offset int
+	simple int
 }
 
 func NewSearcherCommand(client *internal.Client) *cobra.Command {
@@ -29,8 +30,9 @@ func NewSearcherCommand(client *internal.Client) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.StringVarP(&opts.kind, "type", "t", "doc", "Type of search (doc, repo, artboard, group, user, attachment), default doc")
-	flags.IntVarP(&opts.offset, "offset", "o", 1, "Offset of search, default 1")
+	flags.StringVarP(&opts.kind, "type", "t", "doc", "Type of search (doc, repo, artboard, group, user, attachment)")
+	flags.IntVarP(&opts.offset, "offset", "o", 1, "Offset of search")
+	flags.IntVarP(&opts.simple, "simple", "s", 0, "Simple output of search")
 
 	return cmd
 }
@@ -48,11 +50,67 @@ func runSearcher(client *internal.Client, keyWord string, opts *searcherOptions)
 		return err
 	}
 
-	data, err := huge.ToIndentJSON(&s.Data)
+	var t string
+	if opts.simple == 1 {
+		t = `
+{{.ID}}.	
+info:  {{.Info}}
+url:   {{.Url}}
+		`
+	} else {
+		t = `
+{{.ID}}.	
+info:             {{.Info}}
+url:              {{.Url}}
+userLogin: 	      {{.UserLogin}}
+userName:         {{.UserName}}
+userDescription:  {{.UserDescription}}
+repoSlug: 	      {{.RepoSlug}}
+repoName: 		  {{.RepoName}}
+repoDescription:  {{.RepoDescription}}
+docSlug:          {{.DocSlug}}
+docTitle:         {{.DocTitle}}
+docDescription:   {{.DocDescription}}
+`
+	}
+
+	searchInfoTemplate, err := template.New("t").Parse(t)
 	if err != nil {
 		return err
 	}
-	fmt.Println(data)
+
+	for i, v := range s.Data {
+		searchInfo := struct {
+			ID              int
+			Info            string
+			Url             string
+			UserLogin       string
+			UserName        string
+			UserDescription interface{}
+			RepoSlug        string
+			RepoName        string
+			RepoDescription string
+			DocSlug         string
+			DocTitle        string
+			DocDescription  string
+		}{
+			ID:              i + 1,
+			Info:            v.Info,
+			Url:             v.URL,
+			UserLogin:       v.Target.Book.User.Login,
+			UserName:        v.Target.Book.User.Name,
+			UserDescription: v.Target.Book.User.Description,
+			RepoSlug:        v.Target.Book.Slug,
+			RepoName:        v.Target.Book.Name,
+			RepoDescription: v.Target.Book.Description,
+			DocSlug:         v.Target.Slug,
+			DocTitle:        v.Target.Title,
+			DocDescription:  v.Target.Description,
+		}
+		if err = searchInfoTemplate.Execute(os.Stdout, searchInfo); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }

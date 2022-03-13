@@ -1,9 +1,9 @@
 package group
 
 import (
-	"fmt"
+	"os"
+	"text/template"
 
-	huge "github.com/dablelv/go-huge-util"
 	yuque "github.com/my-Sakura/go-yuque-api"
 	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
@@ -14,7 +14,7 @@ func newListCommand(client *internal.Client) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:              "list [OPTIONS]",
 		Short:            "List all group that user join in",
-		Args:             command.ExactArgs(1),
+		Args:             command.NoArgs,
 		PersistentPreRun: client.CheckLogin(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runList(client)
@@ -34,11 +34,34 @@ func runList(client *internal.Client) error {
 		return err
 	}
 
-	data, err := huge.ToIndentJSON(&groups.Data)
+	var t = `
+{{.ID}}.
+login:        {{.Login}}
+name:         {{.Name}}
+description:  {{.Description}}
+`
+
+	groupInfoTemplate, err := template.New("t").Parse(t)
 	if err != nil {
 		return err
 	}
-	fmt.Println(data)
+
+	for i, v := range groups.Data {
+		groupInfo := struct {
+			ID          int
+			Login       string
+			Name        string
+			Description string
+		}{
+			ID:          i + 1,
+			Login:       v.Login,
+			Name:        v.Name,
+			Description: v.Description,
+		}
+		if err = groupInfoTemplate.Execute(os.Stdout, groupInfo); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }

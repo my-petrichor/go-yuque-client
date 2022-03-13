@@ -1,9 +1,9 @@
 package group
 
 import (
-	"fmt"
+	"os"
+	"text/template"
 
-	huge "github.com/dablelv/go-huge-util"
 	yuque "github.com/my-Sakura/go-yuque-api"
 	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
@@ -34,11 +34,34 @@ func runListPublic(client *internal.Client) error {
 		return err
 	}
 
-	data, err := huge.ToIndentJSON(&groups.Data)
+	var t = `
+{{.ID}}.
+login:        {{.Login}}
+name:         {{.Name}}
+description:  {{.Description}}
+	`
+
+	groupInfoTemplate, err := template.New("t").Parse(t)
 	if err != nil {
 		return err
 	}
-	fmt.Println(data)
+
+	for i, v := range groups.Data {
+		groupInfo := struct {
+			ID          int
+			Login       string
+			Name        string
+			Description string
+		}{
+			ID:          i + 1,
+			Login:       v.Login,
+			Name:        v.Name,
+			Description: v.Description,
+		}
+		if err = groupInfoTemplate.Execute(os.Stdout, groupInfo); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }

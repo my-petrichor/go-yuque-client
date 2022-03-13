@@ -10,7 +10,6 @@ import (
 )
 
 type createOptions struct {
-	newLogin    string
 	slug        string
 	kind        string
 	name        string
@@ -33,13 +32,13 @@ func newCreateCommand(client *internal.Client) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.IntVar(&opts.userOrGroup, "user_or_group", 0, "Create repo under user or group (0 - user, 1 - group), default 0")
+	flags.IntVar(&opts.userOrGroup, "user_or_group", 0, "Create repo under user or group (0 - user, 1 - group)")
 	flags.StringVarP(&opts.slug, "slug", "s", "", "Slug of repo")
-	flags.StringVarP(&opts.kind, "type", "t", "Book", "Type of repo (Book, Design, Sheet, Column, Resource, Thread) default Book")
+	flags.StringVarP(&opts.kind, "type", "t", "Book", "Type of repo (Book, Design, Sheet, Column, Resource, Thread)")
 	flags.StringVarP(&opts.name, "name", "n", "", "Name of repo")
 	flags.StringVarP(&opts.description, "description", "d", "", "Description of repo")
 	flags.IntVarP(&opts.public, "public", "p", 0,
-		"Public of repo (0 - private, 1 - all user, 2 - space member, 3 - all user under space (include external contact), 4 - only repo) default 0")
+		"Public of repo (0 - private, 1 - all user, 2 - space member, 3 - all user under space (include external contact), 4 - only repo)")
 
 	cmd.MarkFlagRequired("user_or_group")
 	cmd.MarkFlagRequired("type")

@@ -1,9 +1,9 @@
 package group
 
 import (
-	"fmt"
+	"os"
+	"text/template"
 
-	huge "github.com/dablelv/go-huge-util"
 	yuque "github.com/my-Sakura/go-yuque-api"
 	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
@@ -29,16 +29,65 @@ func runGet(client *internal.Client, groupLogin string) error {
 	if err != nil {
 		return err
 	}
-	g, err := c.Group.GetInfo(groupLogin)
+	groups, err := c.Group.GetInfo(groupLogin)
 	if err != nil {
 		return err
 	}
 
-	data, err := huge.ToIndentJSON(&g.Data)
+	var t = `
+type:               {{.Type}}
+login:              {{.Login}}
+name:               {{.Name}}
+description:        {{.Description}}
+avatarURL:          {{.AvatarUrl}}
+reposCount:         {{.RepoCount}}
+publicReposCount:   {{.PublicReposCount}}
+publicTopicsCount:  {{.PublicTopicsCount}}
+membersCount: 	    {{.MembersCount}}
+grainsSum:          {{.GrainsSum}}
+public:             {{.Public}}
+followersCount:     {{.FollowersCount}},
+followingCount":    {{.FollowingCount}}
+createdAt:          {{.CreatedAt}},
+updatedAt:          {{.UpdatedAt}},
+	`
+	groupInfoTemplate, err := template.New("t").Parse(t)
 	if err != nil {
 		return err
 	}
-	fmt.Println(data)
+	groupInfo := struct {
+		Type              string
+		Login             string
+		Name              string
+		Description       string
+		Public            int
+		AvatarUrl         string
+		RepoCount         int
+		PublicReposCount  int
+		PublicTopicsCount int
+		MembersCount      int
+		GrainsSum         int
+		FollowersCount    int
+		FollowingCount    int
+		CreatedAt         string
+		UpdatedAt         string
+	}{
+		Type:              groups.Data.Type,
+		Login:             groups.Data.Login,
+		Name:              groups.Data.Name,
+		Description:       groups.Data.Description,
+		AvatarUrl:         groups.Data.AvatarURL,
+		RepoCount:         groups.Data.BooksCount,
+		PublicReposCount:  groups.Data.PublicBooksCount,
+		PublicTopicsCount: groups.Data.PublicTopicsCount,
+		MembersCount:      groups.Data.MembersCount,
+		GrainsSum:         groups.Data.GrainsSum,
+		Public:            groups.Data.Public,
+		FollowersCount:    groups.Data.FollowersCount,
+		FollowingCount:    groups.Data.FollowingCount,
+		CreatedAt:         groups.Data.CreatedAt,
+		UpdatedAt:         groups.Data.UpdatedAt,
+	}
 
-	return nil
+	return groupInfoTemplate.Execute(os.Stdout, groupInfo)
 }

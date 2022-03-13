@@ -1,10 +1,10 @@
 package repo
 
 import (
-	"errors"
 	"fmt"
+	"os"
+	"text/template"
 
-	huge "github.com/dablelv/go-huge-util"
 	yuque "github.com/my-Sakura/go-yuque-api"
 	"github.com/my-Sakura/go-yuque-client/internal"
 	"github.com/my-Sakura/go-yuque-client/pkg/command"
@@ -12,7 +12,7 @@ import (
 )
 
 type listOptions struct {
-	userOrGroup int
+	groupLogin string
 }
 
 func newListCommand(client *internal.Client) *cobra.Command {
@@ -29,15 +29,15 @@ func newListCommand(client *internal.Client) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.IntVar(&opts.userOrGroup, "user_or_group", 0, "List repo under user or group (0 - user, 1 - group) default 0")
+	flags.StringVarP(&opts.groupLogin, "group_login", "g", "", "List repo under group")
 
 	return cmd
 }
 
 func runList(client *internal.Client, opts *listOptions) error {
 	var (
-		r   *yuque.ResponseBookSerializer
-		err error
+		repos *yuque.ResponseBookSerializer
+		err   error
 	)
 
 	c, err := yuque.NewClient(client.Token)
@@ -45,22 +45,41 @@ func runList(client *internal.Client, opts *listOptions) error {
 		return err
 	}
 
-	if opts.userOrGroup == 0 {
-		r, err = c.Repo.ListAllUnderUser()
-	} else if opts.userOrGroup == 1 {
-		r, err = c.Repo.ListAllUnderGroup()
+	if opts.groupLogin == "" {
+		repos, err = c.Repo.ListAllUnderUser()
 	} else {
-		return errors.New("Error flag userOrGroup")
+		fmt.Println("----")
+		// r, err = c.Repo.ListAllUnderGroup(opts.groupLogin)
 	}
 	if err != nil {
 		return err
 	}
 
-	data, err := huge.ToIndentJSON(&r.Data)
+	var t = `
+{{.ID}}.
+name:       {{.Name}}
+namespace:  {{.Namespace}}
+		`
+
+	repoInfoTemplate, err := template.New("t").Parse(t)
 	if err != nil {
 		return err
 	}
-	fmt.Println(data)
+
+	for i, v := range repos.Data {
+		repoInfo := struct {
+			ID        int
+			Name      string
+			Namespace string
+		}{
+			ID:        i + 1,
+			Name:      v.Name,
+			Namespace: v.Namespace,
+		}
+		if err = repoInfoTemplate.Execute(os.Stdout, repoInfo); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }

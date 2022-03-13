@@ -5,7 +5,9 @@ Client of yuque application.
 ## Preview
 
 ![](https://github.com/my-Sakura/go-yuque-client/blob/master/images/yuque.png)
-![](https://github.com/my-Sakura/go-yuque-client/blob/master/images/user_get.png)
+![](https://github.com/my-Sakura/go-yuque-client/blob/master/images/get_user.png)
+![](https://github.com/my-Sakura/go-yuque-client/blob/master/images/list_doc.png)
+![](https://github.com/my-Sakura/go-yuque-client/blob/master/images/create_repo.png)
 
 ## Usage
 

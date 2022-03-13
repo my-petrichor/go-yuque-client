@@ -4,10 +4,17 @@ Client of yuque application.
 
 ## Preview
 
-![](https://github.com/my-Sakura/go-yuque-client/blob/master/images/yuque.png)
-![](https://github.com/my-Sakura/go-yuque-client/blob/master/images/get_user.png)
-![](https://github.com/my-Sakura/go-yuque-client/blob/master/images/list_doc.png)
-![](https://github.com/my-Sakura/go-yuque-client/blob/master/images/create_repo.png)
+- yuque command
+  ![](https://github.com/my-Sakura/go-yuque-client/blob/master/images/yuque.png)
+
+- get user info
+  ![](https://github.com/my-Sakura/go-yuque-client/blob/master/images/get_user.png)
+
+- list documents under the repo
+  ![](https://github.com/my-Sakura/go-yuque-client/blob/master/images/list_doc.png)
+
+- create repo and list repo
+  ![](https://github.com/my-Sakura/go-yuque-client/blob/master/images/create_repo.png)
 
 ## Usage
 

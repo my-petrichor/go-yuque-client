@@ -32,7 +32,7 @@ func newCreateCommand(client *internal.Client) *cobra.Command {
 	flags.StringVarP(&opts.slug, "slug", "s", "", "Slug of document")
 	flags.StringVarP(&opts.title, "title", "t", "", "Title of document")
 	flags.StringVarP(&opts.body, "content", "c", "", "Content of document")
-	flags.StringVarP(&opts.format, "format", "f", "markdown", "Type of document (default markdown)")
+	flags.StringVarP(&opts.format, "format", "f", "markdown", "Type of document")
 	flags.IntVarP(&opts.public, "public", "p", 0, "Public of document (0 - private, 1 - public)")
 
 	return cmd

@@ -5,20 +5,20 @@ Client of yuque application.
 ## Preview
 
 - yuque command
- 
-  ![](https://github.com/my-Sakura/go-yuque-client/blob/master/images/yuque.png)
+
+<p align="center"><img src="https://github.com/my-Sakura/go-yuque-client/blob/master/images/yuque.png"/></p>
 
 - get user info
 
-  ![](https://github.com/my-Sakura/go-yuque-client/blob/master/images/get_user.png)
+<p align="center"><img src="https://github.com/my-Sakura/go-yuque-client/blob/master/images/get_user.png"/></p>
 
 - list documents under the repo
 
-  ![](https://github.com/my-Sakura/go-yuque-client/blob/master/images/list_doc.png)
+<p align="center"><img src="https://github.com/my-Sakura/go-yuque-client/blob/master/images/list_doc.png"/></p>
 
 - create repo and list repo
 
-  ![](https://github.com/my-Sakura/go-yuque-client/blob/master/images/create_repo.png)
+<p align="center"><img src="https://github.com/my-Sakura/go-yuque-client/blob/master/images/create_repo.png"/></p>
 
 ## Usage
 ### linux 
